@@ -2,6 +2,7 @@ package com.org.DnDHelper.configurations.security.auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -9,11 +10,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class Auth {
 
     @Autowired
-    PasswordEncoder passwordEncoder;
+    AuthenticationProvider authenticationProvider;
 
     @Autowired
-    public void globalUserDetails(final AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-        authenticationManagerBuilder.inMemoryAuthentication()
-                .withUser("user").password(this.passwordEncoder.encode("test")).roles("admin");
+    public void globalUserDetails(final AuthenticationManagerBuilder authenticationManagerBuilder) {
+        authenticationManagerBuilder.authenticationProvider(authenticationProvider);
     }
 }
