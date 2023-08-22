@@ -1,13 +1,14 @@
 package com.org.DnDHelper.repositories;
 
-import com.org.DnDHelper.entities.Role;
+import com.org.DnDHelper.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface RoleRepository extends JpaRepository<Role, Integer> {
+public interface UserRepository extends JpaRepository<User, Integer> {
 
-    Optional<Role> findByName(String roleName);
+    Optional<User> findByAuthUserMail(String authUsername);
+
 }

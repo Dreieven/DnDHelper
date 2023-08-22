@@ -1,28 +1,31 @@
 package com.org.DnDHelper.services;
 
 import com.org.DnDHelper.entities.AuthUser;
+import com.org.DnDHelper.entities.User;
 import com.org.DnDHelper.exceptions.UserAlreadyExistsException;
 import com.org.DnDHelper.messages.RegisterUserRequest;
 import com.org.DnDHelper.repositories.AuthUserRepository;
 import com.org.DnDHelper.repositories.RoleRepository;
+import com.org.DnDHelper.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.management.relation.RoleNotFoundException;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AuthService {
     @Autowired
-    AuthUserRepository userRepository;
+    AuthUserRepository authUserRepository;
+    @Autowired
+    UserRepository userRepository;
     @Autowired
     RoleRepository roleRepository;
     @Autowired
     PasswordEncoder passwordEncoder;
-
     public AuthUser registerUser(RegisterUserRequest userRequest) throws UserAlreadyExistsException, RoleNotFoundException {
         return registerUser(userRequest, "player");
     }
@@ -37,11 +40,14 @@ public class AuthService {
                 .password(passwordEncoder.encode(userRequest.getPassword()))
                 .roles(List.of(roleRepository.findByName(roleName).orElseThrow(() -> new RoleNotFoundException("There is no role "+ roleName))))
                 .build();
-        userRepository.save(authUser);
+        authUserRepository.save(authUser);
+        userRepository.save(User.builder()
+                .authUserMail(userRequest.getEmail())
+                .build());
         return authUser;
     }
 
     public boolean emailExists(String email) {
-        return userRepository.findByEmail(email).isPresent();
+        return authUserRepository.findByEmail(email).isPresent();
     }
 }
